@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -e
+
+not_installed() {
+  ! command -v $1 > /dev/null 2>&1
+}
+
+nexus_resource_dir=$(cd $(dirname $0)/.. && pwd)
+
+if not_installed ginkgo; then
+  echo "# ginkgo is not installed! run the following command:"
+  echo "    go install github.com/onsi/ginkgo/ginkgo"
+  exit 1
+fi
+
+cd $nexus_resource_dir
+
+export NEXUS_TESTING_URL="some-url"
+export NEXUS_TESTING_USERNAME="some-username"
+export NEXUS_TESTING_PASSWORD="some-password"
+export NEXUS_TESTING_REPOSITORY="some-repository"
+
+ginkgo -race integration
