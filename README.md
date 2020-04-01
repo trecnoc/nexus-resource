@@ -1,5 +1,7 @@
 # Nexus Resource
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/trecnoc/nexus-resource)](https://goreportcard.com/report/github.com/trecnoc/nexus-resource)
+
 Versions objects in a Nexus repository of type Raw only, by pattern-matching
 filenames to identify version numbers.
 
