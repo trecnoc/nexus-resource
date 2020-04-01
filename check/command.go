@@ -8,16 +8,19 @@ import (
 	"github.com/trecnoc/nexus-resource/versions"
 )
 
+// Command struct for Check
 type Command struct {
 	nexusclient nexusresource.NexusClient
 }
 
+// NewCommand creates a new Check command
 func NewCommand(nexusclient nexusresource.NexusClient) *Command {
 	return &Command{
 		nexusclient: nexusclient,
 	}
 }
 
+// Run the command
 func (command *Command) Run(request Request) (Response, error) {
 	if ok, message := request.Source.IsValid(); !ok {
 		return Response{}, errors.New(message)
@@ -32,9 +35,8 @@ func (command *Command) Run(request Request) (Response, error) {
 	lastVersion, matched := versions.Extract(request.Version.Path, request.Source.Regexp)
 	if !matched {
 		return latestVersion(extractions), nil
-	} else {
-		return newVersions(lastVersion, extractions), nil
 	}
+	return newVersions(lastVersion, extractions), nil
 }
 
 func latestVersion(extractions versions.Extractions) Response {

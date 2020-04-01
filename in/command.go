@@ -13,12 +13,15 @@ import (
 	"github.com/trecnoc/nexus-resource/versions"
 )
 
+// ErrMissingPath Error
 var ErrMissingPath = errors.New("missing path in request")
 
+// MetadataProvider struct
 type MetadataProvider struct {
 	nexusClient nexusresource.NexusClient
 }
 
+// GetURL returns the Nexus URL for the provided remotePath
 func (provider *MetadataProvider) GetURL(request Request, remotePath string) string {
 	return provider.nexusURL(request, remotePath)
 }
@@ -27,6 +30,7 @@ func (provider *MetadataProvider) nexusURL(request Request, remotePath string) s
 	return provider.nexusClient.URL(request.Source.Repository, remotePath)
 }
 
+// GetSHA returns the SHA for the provided remotePath
 func (provider *MetadataProvider) GetSHA(request Request, remotePath string) string {
 	return provider.nexusSHA(request, remotePath)
 }
@@ -35,11 +39,13 @@ func (provider *MetadataProvider) nexusSHA(request Request, remotePath string) s
 	return provider.nexusClient.SHA(request.Source.Repository, remotePath)
 }
 
+// Command struct for In
 type Command struct {
 	nexusclient      nexusresource.NexusClient
 	metadataProvider MetadataProvider
 }
 
+// NewCommand creates a new In command
 func NewCommand(nexusclient nexusresource.NexusClient) *Command {
 	return &Command{
 		nexusclient: nexusclient,
@@ -49,6 +55,7 @@ func NewCommand(nexusclient nexusresource.NexusClient) *Command {
 	}
 }
 
+// Run the command
 func (command *Command) Run(destinationDir string, request Request) (Response, error) {
 	if ok, message := request.Source.IsValid(); !ok {
 		return Response{}, errors.New(message)

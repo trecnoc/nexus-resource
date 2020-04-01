@@ -10,10 +10,12 @@ import (
 	"github.com/trecnoc/nexus-resource/utils"
 )
 
+// Match paths against a provided pattern by anchoring it
 func Match(paths []string, pattern string) ([]string, error) {
 	return MatchUnanchored(paths, "^"+pattern+"$")
 }
 
+// MatchUnanchored paths against a pattern
 func MatchUnanchored(paths []string, pattern string) ([]string, error) {
 	matched := []string{}
 
@@ -33,6 +35,7 @@ func MatchUnanchored(paths []string, pattern string) ([]string, error) {
 	return matched, nil
 }
 
+// Extract an version from a path with a provided pattern
 func Extract(path string, pattern string) (Extraction, bool) {
 	compiled := regexp.MustCompile(pattern)
 	matches := compiled.FindStringSubmatch(path)
@@ -77,6 +80,7 @@ func sliceIndex(haystack []string, needle string) int {
 	return -1
 }
 
+// Extractions type
 type Extractions []Extraction
 
 func (e Extractions) Len() int {
@@ -91,6 +95,7 @@ func (e Extractions) Swap(i int, j int) {
 	e[i], e[j] = e[j], e[i]
 }
 
+// Extraction struct for a path/version combination
 type Extraction struct {
 	// path to nexus artifact in repository
 	Path string
@@ -102,6 +107,7 @@ type Extraction struct {
 	VersionNumber string
 }
 
+// GetRepositoryItemVersions returns the Extractions for a provided Source
 func GetRepositoryItemVersions(client nexusresource.NexusClient, source models.Source) Extractions {
 	paths, err := client.ListFiles(source.Repository, source.Group)
 	if err != nil {
