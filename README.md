@@ -120,26 +120,18 @@ will stop the build.
 Run the tests with the following commands:
 
 ```sh
-docker build -t nexus-resource:alpine -f dockerfiles/alpine/Dockerfile .
-docker build -t nexus-resource:ubuntu -f dockerfiles/ubuntu/Dockerfile .
+docker build -t nexus-resource -f Dockerfile .
 ```
 
 #### Integration tests
 
-The integration requires two AWS S3 buckets, one without versioning and another
-with. The `docker build` step requires setting `--build-args` so the
-integration will run.
+The integration requires access to a Nexus server with a Raw repository.
+The `docker build` step requires setting `--build-args` so the integration will run.
 
 Run the tests with the following command:
 
 ```sh
-docker build . -t nexus-resource:alpine -f dockerfiles/alpine/Dockerfile \
-  --build-arg NEXUS_TESTING_URL="some-url" \
-  --build-arg NEXUS_TESTING_USERNAME="some-username" \
-  --build-arg NEXUS_TESTING_PASSWORD="some-password" \
-  --build-arg NEXUS_TESTING_REPOSITORY="some-repository"
-
-docker build . -t nexus-resource:ubuntu -f dockerfiles/ubuntu/Dockerfile \
+docker build . -t nexus-resource -f Dockerfile \
   --build-arg NEXUS_TESTING_URL="some-url" \
   --build-arg NEXUS_TESTING_USERNAME="some-username" \
   --build-arg NEXUS_TESTING_PASSWORD="some-password" \
