@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	neturl "net/url"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -84,6 +87,9 @@ var _ = Describe("out", func() {
 		})
 
 		It("uploads the file to the correct bucket and outputs the version", func() {
+			// Let Nexus time to index for search
+			time.Sleep(2 * time.Second)
+
 			nexuspaths, err := nexusclient.ListFiles(repository, groupPrefix)
 			Ω(err).ShouldNot(HaveOccurred())
 
@@ -94,6 +100,9 @@ var _ = Describe("out", func() {
 			var response out.Response
 			err = json.NewDecoder(reader).Decode(&response)
 			Ω(err).ShouldNot(HaveOccurred())
+
+			u, _ := neturl.Parse(url)
+			u.Path = path.Join(u.Path, "repository", repository, "out-request-files/glob-file-to-upload")
 
 			Ω(response).Should(Equal(out.Response{
 				Version: models.Version{
@@ -106,7 +115,7 @@ var _ = Describe("out", func() {
 					},
 					{
 						Name:  "url",
-						Value: url + "/repository/" + repository + "/out-request-files/glob-file-to-upload",
+						Value: u.String(),
 					},
 				},
 			}))

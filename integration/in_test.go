@@ -5,10 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	neturl "net/url"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -89,6 +92,9 @@ var _ = Describe("in", func() {
 
 			err = os.Remove(tempFile.Name())
 			Ω(err).ShouldNot(HaveOccurred())
+
+			// Let Nexus time to index for search
+			time.Sleep(1 * time.Second)
 		})
 
 		AfterEach(func() {
@@ -105,6 +111,9 @@ var _ = Describe("in", func() {
 			err := json.NewDecoder(reader).Decode(&response)
 			Ω(err).ShouldNot(HaveOccurred())
 
+			u, _ := neturl.Parse(url)
+			u.Path = path.Join(u.Path, "repository", repository, "in-request-files/some-file-2")
+
 			Ω(response).Should(Equal(in.Response{
 				Version: models.Version{
 					Path: "in-request-files/some-file-2",
@@ -116,7 +125,7 @@ var _ = Describe("in", func() {
 					},
 					{
 						Name:  "url",
-						Value: url + "/repository/" + repository + "/in-request-files/some-file-2",
+						Value: u.String(),
 					},
 					{
 						Name:  "sha",
@@ -138,7 +147,7 @@ var _ = Describe("in", func() {
 			Ω(filepath.Join(destDir, "url")).Should(BeARegularFile())
 			urlContents, err := ioutil.ReadFile(filepath.Join(destDir, "url"))
 			Ω(err).ShouldNot(HaveOccurred())
-			Ω(urlContents).Should(Equal([]byte(url + "/repository/" + repository + "/in-request-files/some-file-2")))
+			Ω(urlContents).Should(Equal([]byte(u.String())))
 
 			Ω(filepath.Join(destDir, "sha")).Should(BeARegularFile())
 			shaContents, err := ioutil.ReadFile(filepath.Join(destDir, "sha"))

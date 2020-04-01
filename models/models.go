@@ -54,7 +54,8 @@ type MetadataPair struct {
 
 // RespositoryItems struct is a collection of RepositoryItems
 type RespositoryItems struct {
-	Items []RepositoryItem `json:"items"`
+	Items             []RepositoryItem `json:"items"`
+	ContinuationToken string           `json:"continuationToken"`
 }
 
 // RepositoryItem struct represent a Component in Nexus
