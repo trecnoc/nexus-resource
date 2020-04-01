@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Set up Go 1.14
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.14.x
+
+    - name: Install dependencies
+      run: |
+         sudo apt update
+         sudo apt-get install unzip zip
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Generate fakes
+      run: go generate ./...
+
+    - name: Test
+      run: go test -covermode=count ./...
+      env:
+        CGO_ENABLED: 0
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+
+    - name: Set up Go 1.14
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.14.x
+
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: |
+        go build -o assets/check ./cmd/check/main.go
+        go build -o assets/in ./cmd/in/main.go
+        go build -o assets/out ./cmd/out/main.go
