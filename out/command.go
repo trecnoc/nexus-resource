@@ -11,11 +11,13 @@ import (
 	"github.com/trecnoc/nexus-resource/models"
 )
 
+// Command struct for Out
 type Command struct {
 	nexusclient nexusresource.NexusClient
 	stderr      io.Writer
 }
 
+// NewCommand creates a new Out command
 func NewCommand(stderr io.Writer, nexusclient nexusresource.NexusClient) *Command {
 	return &Command{
 		stderr:      stderr,
@@ -23,6 +25,7 @@ func NewCommand(stderr io.Writer, nexusclient nexusresource.NexusClient) *Comman
 	}
 }
 
+// Run the command
 func (command *Command) Run(sourceDir string, request Request) (Response, error) {
 	if ok, message := request.Source.IsValid(); !ok {
 		return Response{}, errors.New(message)

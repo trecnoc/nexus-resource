@@ -18,6 +18,7 @@ import (
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/FakeNexusClient.go --fake-name FakeNexusClient . NexusClient
 
+// NexusClient Interface
 type NexusClient interface {
 	ListFiles(repositoryName string, group string) ([]string, error)
 	DownloadFile(repositoryName string, name string, localPath string) error
@@ -34,6 +35,7 @@ type nexusclient struct {
 	password   string
 }
 
+// MewNexusClient creates and returns an NexusClient
 func NewNexusClient(nexusURL string, username string, password string) NexusClient {
 	httpClient := &http.Client{
 		Timeout: 10 * time.Second,

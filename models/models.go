@@ -2,6 +2,7 @@ package models
 
 import "strings"
 
+// Source Struct for the Nexus Resource
 type Source struct {
 	URL        string `json:"url"`
 	Repository string `json:"repository"`
@@ -11,6 +12,7 @@ type Source struct {
 	Regexp     string `json:"regexp"`
 }
 
+// IsValid validates the provided Source
 func (source Source) IsValid() (bool, string) {
 	if source.URL == "" {
 		return false, "url must be specified"
@@ -39,19 +41,23 @@ func (source Source) IsValid() (bool, string) {
 	return true, ""
 }
 
+// Version struct
 type Version struct {
 	Path string `json:"path,omitempty"`
 }
 
+// MetadataPair struct
 type MetadataPair struct {
 	Name  string `json:"name"`
 	Value string `json:"value"`
 }
 
+// RespositoryItems struct is a collection of RepositoryItems
 type RespositoryItems struct {
 	Items []RepositoryItem `json:"items"`
 }
 
+// RepositoryItem struct represent a Component in Nexus
 type RepositoryItem struct {
 	ID     string                `json:"id"`
 	Group  string                `json:"group"`
@@ -59,12 +65,14 @@ type RepositoryItem struct {
 	Assets []RepositoryItemAsset `json:"assets"`
 }
 
+// RepositoryItemAsset struct represent an Asset in Nexus
 type RepositoryItemAsset struct {
 	DownloadURL string                       `json:"downloadUrl"`
 	ID          string                       `json:"id"`
 	Checksum    RepositoryItemAssetsChecksum `json:"checksum"`
 }
 
+// RepositoryItemAssetsChecksum struct represent an Assets Checksum in Nexus
 type RepositoryItemAssetsChecksum struct {
 	Sha1   string `json:"sha1"`
 	Sha256 string `json:"sha256"`
