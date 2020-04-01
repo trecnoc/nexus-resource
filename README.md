@@ -1,5 +1,6 @@
 # Nexus Resource
 
+![](https://github.com/trecnoc/nexus-resource/workflows/CI/badge.svg?branch=master)
 [![Go Report Card](https://goreportcard.com/badge/github.com/trecnoc/nexus-resource)](https://goreportcard.com/report/github.com/trecnoc/nexus-resource)
 
 Versions objects in a Nexus repository of type Raw only, by pattern-matching
