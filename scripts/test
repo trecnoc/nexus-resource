@@ -16,4 +16,7 @@ fi
 
 cd $nexus_resource_dir
 
+# Generate Fakes
+go generate ./...
+
 ginkgo -r -p -skipPackage integration

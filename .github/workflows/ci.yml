@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  CGO_ENABLED: 0
+
 on:
   push:
     branches: [ master ]
@@ -8,36 +11,9 @@ on:
 
 jobs:
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Set up Go 1.14
-      uses: actions/setup-go@v1
-      with:
-        go-version: 1.14.x
-
-    - name: Install dependencies
-      run: |
-         sudo apt update
-         sudo apt-get install unzip zip
-
-    - name: Check out code
-      uses: actions/checkout@v2
-
-    - name: Generate fakes
-      run: go generate ./...
-
-    - name: Test
-      run: go test -covermode=count ./...
-      env:
-        CGO_ENABLED: 0
-
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [test]
     steps:
 
     - name: Set up Go 1.14
@@ -45,10 +21,21 @@ jobs:
       with:
         go-version: 1.14.x
 
+    - name: Install required dependencies
+      run: |
+        sudo apt update
+        sudo apt-get install -y --no-install-recommends tzdata ca-certificates unzip zip
+
     - name: Check out code
       uses: actions/checkout@v2
 
-    - name: Build
+    - name: Generate fakes for testing
+      run: go generate ./...
+
+    - name: Run tests
+      run: go test ./...
+
+    - name: Build assets
       run: |
         go build -o assets/check ./cmd/check/main.go
         go build -o assets/in ./cmd/in/main.go
