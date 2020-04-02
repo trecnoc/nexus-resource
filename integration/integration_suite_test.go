@@ -84,7 +84,7 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 
 var _ = BeforeEach(func() {
 	if nexusclient == nil {
-		Skip("Environment variables need to be set for Nexus integration")
+		Skip("Environment variables need to be set for running integration tests")
 	}
 })
 

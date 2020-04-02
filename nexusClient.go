@@ -35,7 +35,7 @@ type nexusclient struct {
 	password   string
 }
 
-// MewNexusClient creates and returns an NexusClient
+// NewNexusClient creates and returns an NexusClient
 func NewNexusClient(nexusURL string, username string, password string) NexusClient {
 	httpClient := &http.Client{
 		Timeout: 10 * time.Second,
@@ -142,9 +142,6 @@ func (client *nexusclient) UploadFile(repositoryName string, group string, remot
 		return fmt.Errorf("UploadFile: received invalid status code %d", resp.StatusCode)
 	}
 
-	// File was uploaded let Nexus time to index the file
-	time.Sleep(1 * time.Second)
-
 	return nil
 }
 
@@ -179,14 +176,9 @@ func (client *nexusclient) DeleteFile(repositoryName string, name string) error 
 }
 
 func (client *nexusclient) URL(repositoryName string, name string) string {
-	var url string
-
-	item, err := client.getRepositoryItem(repositoryName, name)
-	if err == nil {
-		url = item.Assets[0].DownloadURL
-	}
-
-	return url
+	u, _ := url.Parse(client.nexusURL)
+	u.Path = path.Join(u.Path, "repository", repositoryName, name)
+	return u.String()
 }
 
 func (client *nexusclient) SHA(repositoryName string, name string) string {
@@ -236,26 +228,48 @@ func (client *nexusclient) doGetRequestPath(requestPath string, parameters map[s
 
 func (client *nexusclient) getRepositoryGroupContent(repositoryName string, group string) (map[string]models.RepositoryItem, error) {
 	repositoryItems := map[string]models.RepositoryItem{}
-	var parameters map[string]string
+	continuation := ""
 
-	parameters = make(map[string]string)
-	parameters["repository"] = repositoryName
-	parameters["group"] = group
+	getContents := func() (repositoryItems models.RespositoryItems, err error) {
+		var parameters map[string]string
 
-	response, err := client.doGetRequestPath("service/rest/v1/search", parameters)
-	if err != nil {
-		return repositoryItems, err
+		parameters = make(map[string]string)
+		parameters["repository"] = repositoryName
+		parameters["group"] = group
+
+		if continuation != "" {
+			parameters["continuationToken"] = continuation
+		}
+
+		response, err := client.doGetRequestPath("service/rest/v1/search", parameters)
+		if err != nil {
+			return repositoryItems, err
+		}
+		defer response.Body.Close()
+
+		decoder := json.NewDecoder(response.Body)
+		err = decoder.Decode(&repositoryItems)
+
+		return
 	}
-	defer response.Body.Close()
 
-	decoder := json.NewDecoder(response.Body)
-	var items models.RespositoryItems
-	err = decoder.Decode(&items)
-	if err != nil {
-		return repositoryItems, err
+	items := make([]models.RepositoryItem, 0)
+	for {
+		resp, err := getContents()
+		if err != nil {
+			return repositoryItems, err
+		}
+
+		items = append(items, resp.Items...)
+
+		if resp.ContinuationToken == "" {
+			break
+		}
+
+		continuation = resp.ContinuationToken
 	}
 
-	for _, item := range items.Items {
+	for _, item := range items {
 		repositoryItems[item.Name] = item
 	}
 

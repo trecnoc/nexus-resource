@@ -60,6 +60,9 @@ var _ = Describe("Nexuxclient", func() {
 		err = nexusclient.UploadFile(repository, groupPrefix, "file-to-upload-3", tempFile.Name())
 		Ω(err).ShouldNot(HaveOccurred())
 
+		// Let Nexus time to index for search
+		time.Sleep(1 * time.Second)
+
 		paths, err := nexusclient.ListFiles(repository, groupPrefix)
 		Ω(err).ShouldNot(HaveOccurred())
 
