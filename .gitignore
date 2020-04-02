@@ -16,3 +16,6 @@ vendor/
 
 # Built assets
 assets/
+
+# Generated Fakes
+fakes/

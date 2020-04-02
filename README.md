@@ -111,7 +111,16 @@ First get the resource via:
 * docker is *required* - version 19.03.x is tested; earlier versions may also
   work.
 
-### Running the tests
+### Local
+
+Generate the Fakes with Counterfeiter if running tests locally or use the provided
+scrips in the `scripts` folder.
+
+Counterfeiter can be run with `go generate ./...`
+
+### Docker
+
+#### Running the tests
 
 The tests have been embedded with the `Dockerfile`; ensuring that the testing
 environment is consistent across any `docker` enabled platform. When the docker
@@ -124,7 +133,7 @@ Run the tests with the following commands:
 docker build -t nexus-resource -f Dockerfile .
 ```
 
-#### Integration tests
+##### Integration tests
 
 The integration requires access to a Nexus server with a Raw repository.
 The `docker build` step requires setting `--build-args` so the integration will run.
