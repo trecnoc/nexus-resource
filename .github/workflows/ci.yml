@@ -14,6 +14,13 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+
+    services:
+      nexus:
+        image: trecnoc/nexus3-custom
+        ports:
+          - 8081:8081
+
     steps:
 
     - name: Set up Go 1.14
@@ -32,8 +39,18 @@ jobs:
     - name: Generate fakes for testing
       run: go generate ./...
 
+    - name: Sleep to let Nexus start
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '60s'
+
     - name: Run tests
       run: go test ./...
+      env:
+        NEXUS_TESTING_URL: "http://localhost:8081"
+        NEXUS_TESTING_USERNAME: "admin"
+        NEXUS_TESTING_PASSWORD: "admin123"
+        NEXUS_TESTING_REPOSITORY: "nexus-test"
 
     - name: Build assets
       run: |
