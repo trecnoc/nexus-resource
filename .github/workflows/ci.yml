@@ -39,11 +39,6 @@ jobs:
     - name: Generate fakes for testing
       run: go generate ./...
 
-    - name: Sleep to let Nexus start
-      uses: jakejarvis/wait-action@master
-      with:
-        time: '60s'
-
     - name: Run tests
       run: go test ./...
       env:
