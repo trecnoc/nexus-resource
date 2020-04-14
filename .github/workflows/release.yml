@@ -13,9 +13,10 @@ jobs:
     - name: Build and Publish to DockerHub
       uses: docker/build-push-action@v1
       with:
-        repository: trecnoc/nexus3-resource
+        repository: trecnoc/nexus-resource
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+        tags: latest
         tags_with_ref: true
     - name: Create GitHub Release
       uses: actions/create-release@latest
