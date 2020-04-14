@@ -18,11 +18,25 @@ var _ = Describe("Models", func() {
 					Password:   "password",
 					Group:      "/group",
 					Regexp:     "group/a(.*).tgz",
+					Debug:      false,
 				}
 
 				ok, err := source.IsValid()
 				Ω(ok).Should(BeTrue())
 				Ω(err).Should(Equal(""))
+			})
+
+			It("defaults debug to false", func() {
+				var source = models.Source{
+					URL:        "http://nexus-url.com",
+					Repository: "repository-name",
+					Username:   "user",
+					Password:   "password",
+					Group:      "/group",
+					Regexp:     "group/a(.*).tgz",
+				}
+
+				Ω(source.Debug).Should(BeFalse())
 			})
 		})
 

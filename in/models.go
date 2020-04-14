@@ -9,7 +9,7 @@ type Request struct {
 	Params  Params         `json:"params"`
 }
 
-// Params struct for the Out command
+// Params struct for the In command
 type Params struct {
 	Unpack       bool `json:"unpack"`
 	SkipDownload bool `json:"skip_download"`

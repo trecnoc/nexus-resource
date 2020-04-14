@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"os"
 
 	"github.com/trecnoc/nexus-resource"
@@ -13,7 +14,12 @@ func main() {
 	var request check.Request
 	inputRequest(&request)
 
-	client := nexusresource.NewNexusClient(request.Source.URL, request.Source.Username, request.Source.Password)
+	if request.Source.Debug {
+		jsonString, _ := json.Marshal(request)
+		ioutil.WriteFile("/tmp/concourse-nexus-request.json", jsonString, os.ModePerm)
+	}
+
+	client := nexusresource.NewNexusClient(request.Source.URL, request.Source.Username, request.Source.Password, request.Source.Debug)
 
 	command := check.NewCommand(client)
 	response, err := command.Run(request)

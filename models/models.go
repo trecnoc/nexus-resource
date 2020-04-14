@@ -10,6 +10,7 @@ type Source struct {
 	Password   string `json:"password"`
 	Group      string `json:"directory"`
 	Regexp     string `json:"regexp"`
+	Debug      bool   `json:"debug"`
 }
 
 // IsValid validates the provided Source

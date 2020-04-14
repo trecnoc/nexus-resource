@@ -109,6 +109,8 @@ type Extraction struct {
 
 // GetRepositoryItemVersions returns the Extractions for a provided Source
 func GetRepositoryItemVersions(client nexusresource.NexusClient, source models.Source) Extractions {
+	l := utils.NewLogger(source.Debug)
+	l.LogSimpleMessage("In GetRepositoryItemVersions")
 	paths, err := client.ListFiles(source.Repository, source.Group)
 	if err != nil {
 		utils.Fatal("listing files", err)
@@ -118,6 +120,7 @@ func GetRepositoryItemVersions(client nexusresource.NexusClient, source models.S
 	if err != nil {
 		utils.Fatal("finding matches", err)
 	}
+	l.LogSimpleMessage("In GetRepositoryItemVersions found '%d' matching paths to the regex", len(matchingPaths))
 
 	var extractions = make(Extractions, 0, len(matchingPaths))
 	for _, path := range matchingPaths {
@@ -129,6 +132,7 @@ func GetRepositoryItemVersions(client nexusresource.NexusClient, source models.S
 	}
 
 	sort.Sort(extractions)
+	l.LogSimpleMessage("In GetRepositoryItemVersions extracted '%d' versions from the matching paths", len(extractions))
 
 	return extractions
 }
