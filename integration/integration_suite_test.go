@@ -3,6 +3,7 @@ package integration_test
 import (
 	"encoding/json"
 	"os"
+	"strconv"
 	"testing"
 
 	. "github.com/onsi/ginkgo"
@@ -20,6 +21,7 @@ var url = os.Getenv("NEXUS_TESTING_URL")
 var username = os.Getenv("NEXUS_TESTING_USERNAME")
 var password = os.Getenv("NEXUS_TESTING_PASSWORD")
 var repository = os.Getenv("NEXUS_TESTING_REPOSITORY")
+var debug = os.Getenv("NEXUS_TESTING_DEBUG")
 
 var nexusclient nexusresource.NexusClient
 var checkPath string
@@ -41,12 +43,6 @@ func findOrCreate(binName string) string {
 		Ω(err).ShouldNot(HaveOccurred())
 		return path
 	}
-}
-
-func getNexusClient(nexusURL string, username string, password string) nexusresource.NexusClient {
-	nexusclient := nexusresource.NewNexusClient(nexusURL, username, password)
-
-	return nexusclient
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
@@ -78,7 +74,12 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		Ω(password).ShouldNot(BeEmpty(), "must specify $NEXUS_TESTING_PASSWORD")
 		Ω(repository).ShouldNot(BeEmpty(), "must specify $NEXUS_TESTING_REPOSITORY")
 
-		nexusclient = nexusresource.NewNexusClient(url, username, password)
+		debugbool, err := strconv.ParseBool(debug)
+		if err != nil {
+			debugbool = false
+		}
+
+		nexusclient = nexusresource.NewNexusClient(url, username, password, debugbool)
 	}
 })
 

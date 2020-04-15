@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/trecnoc/nexus-resource/models"
+	"github.com/trecnoc/nexus-resource/utils"
 )
 
 //go:generate go run github.com/maxbrunsfeld/counterfeiter/v6 -o fakes/FakeNexusClient.go --fake-name FakeNexusClient . NexusClient
@@ -33,23 +34,29 @@ type nexusclient struct {
 	nexusURL   string
 	username   string
 	password   string
+	logger     *utils.StandardLogger
 }
 
 // NewNexusClient creates and returns an NexusClient
-func NewNexusClient(nexusURL string, username string, password string) NexusClient {
+func NewNexusClient(nexusURL string, username string, password string, debug bool) NexusClient {
 	httpClient := &http.Client{
 		Timeout: 10 * time.Second,
 	}
+
+	var logger = utils.NewLogger(debug)
+	logger.NewNexusClient(nexusURL, username)
 
 	return &nexusclient{
 		httpClient: httpClient,
 		nexusURL:   nexusURL,
 		username:   username,
 		password:   password,
+		logger:     logger,
 	}
 }
 
 func (client *nexusclient) ListFiles(repositoryName string, group string) ([]string, error) {
+	client.logger.LogSimpleMessage("In ListFiles for repository '%s' and group '%s'", repositoryName, group)
 	entries, err := client.getRepositoryGroupContent(repositoryName, group)
 
 	if err != nil {
@@ -65,6 +72,7 @@ func (client *nexusclient) ListFiles(repositoryName string, group string) ([]str
 }
 
 func (client *nexusclient) DownloadFile(repositoryName string, name string, localPath string) error {
+	client.logger.LogSimpleMessage("In DownloadFile for repository '%s', name '%s' and path '%s'", repositoryName, name, localPath)
 	var url string
 
 	url = client.URL(repositoryName, name)
@@ -95,6 +103,7 @@ func (client *nexusclient) DownloadFile(repositoryName string, name string, loca
 }
 
 func (client *nexusclient) UploadFile(repositoryName string, group string, remoteFilename string, localPath string) error {
+	client.logger.LogSimpleMessage("In UploadFile for repository '%s', group '%s', filename '%s' and path '%s'", repositoryName, group, remoteFilename, localPath)
 	localFile, err := os.Open(localPath)
 	if err != nil {
 		return err
@@ -122,6 +131,7 @@ func (client *nexusclient) UploadFile(repositoryName string, group string, remot
 	q.Add("repository", repositoryName)
 	u.RawQuery = q.Encode()
 
+	client.logger.LogHTTPRequest(http.MethodPost, u.String())
 	req, err := http.NewRequest(http.MethodPost, u.String(), body)
 	if err != nil {
 		return err
@@ -146,6 +156,7 @@ func (client *nexusclient) UploadFile(repositoryName string, group string, remot
 }
 
 func (client *nexusclient) DeleteFile(repositoryName string, name string) error {
+	client.logger.LogSimpleMessage("In DeleteFile for repository '%s' and name '%s'", repositoryName, name)
 	item, err := client.getRepositoryItem(repositoryName, name)
 	if err != nil {
 		return err
@@ -154,6 +165,7 @@ func (client *nexusclient) DeleteFile(repositoryName string, name string) error 
 	u, _ := url.Parse(client.nexusURL)
 	u.Path = path.Join(u.Path, "service/rest/v1/components", item.ID)
 
+	client.logger.LogHTTPRequest(http.MethodDelete, u.String())
 	req, err := http.NewRequest(http.MethodDelete, u.String(), nil)
 	if err != nil {
 		return err
@@ -176,12 +188,14 @@ func (client *nexusclient) DeleteFile(repositoryName string, name string) error 
 }
 
 func (client *nexusclient) URL(repositoryName string, name string) string {
+	client.logger.LogSimpleMessage("In URL for repository '%s' and name '%s'", repositoryName, name)
 	u, _ := url.Parse(client.nexusURL)
 	u.Path = path.Join(u.Path, "repository", repositoryName, name)
 	return u.String()
 }
 
 func (client *nexusclient) SHA(repositoryName string, name string) string {
+	client.logger.LogSimpleMessage("In SHA for repository '%s' and name '%s'", repositoryName, name)
 	var sha string
 
 	item, err := client.getRepositoryItem(repositoryName, name)
@@ -201,6 +215,8 @@ func (client *nexusclient) doGetRequest(requestURL string, parameters map[string
 		}
 		u.RawQuery = q.Encode()
 	}
+
+	client.logger.LogHTTPRequest(http.MethodGet, u.String())
 
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
@@ -227,6 +243,7 @@ func (client *nexusclient) doGetRequestPath(requestPath string, parameters map[s
 }
 
 func (client *nexusclient) getRepositoryGroupContent(repositoryName string, group string) (map[string]models.RepositoryItem, error) {
+	client.logger.LogSimpleMessage("In getRepositoryGroupContent for repository '%s' and group '%s'", repositoryName, group)
 	repositoryItems := map[string]models.RepositoryItem{}
 	continuation := ""
 
@@ -266,6 +283,7 @@ func (client *nexusclient) getRepositoryGroupContent(repositoryName string, grou
 			break
 		}
 
+		client.logger.LogSimpleMessage("In getRepositoryGroupContent got a non-nil ContinuationToken, fetching next results")
 		continuation = resp.ContinuationToken
 	}
 
@@ -273,10 +291,13 @@ func (client *nexusclient) getRepositoryGroupContent(repositoryName string, grou
 		repositoryItems[item.Name] = item
 	}
 
+	client.logger.LogSimpleMessage("In getRepositoryGroupContent found a total of %d item(s)", len(repositoryItems))
+
 	return repositoryItems, nil
 }
 
 func (client *nexusclient) getRepositoryItem(repositoryName string, name string) (models.RepositoryItem, error) {
+	client.logger.LogSimpleMessage("In getRepositoryItem for repository '%s' and name '%s'", repositoryName, name)
 	var item models.RepositoryItem
 	var parameters map[string]string
 
@@ -298,8 +319,10 @@ func (client *nexusclient) getRepositoryItem(repositoryName string, name string)
 	}
 
 	if len(items.Items) != 1 {
+		client.logger.LogSimpleMessage("In getRepositoryItem didn't find component found '%d' instead", len(items.Items))
 		return item, fmt.Errorf("getRepositoryItem: expected 1 Component got %d", len(items.Items))
 	} else if len(items.Items[0].Assets) != 1 {
+		client.logger.LogSimpleMessage("In getRepositoryItem component didn't have 1 Asset found '%d'", len(items.Items[0].Assets))
 		return item, fmt.Errorf("getRepositoryItem: Component should only have 1 Asset, contains %d", len(items.Items[0].Assets))
 	}
 
