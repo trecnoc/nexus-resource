@@ -98,7 +98,7 @@ var _ = Describe("Models", func() {
 				Ω(err).Should(Equal("password must be specified"))
 			})
 
-			It("validates invalid Directory", func() {
+			It("validates invalid Group", func() {
 				var source = models.Source{
 					URL:        "http://nexus-url.com",
 					Repository: "repository-name",

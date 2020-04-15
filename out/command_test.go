@@ -138,9 +138,9 @@ var _ = Describe("Out Command", func() {
 				Ω(err).ShouldNot(HaveOccurred())
 
 				Ω(nexusclient.UploadFileCallCount()).Should(Equal(1))
-				repositoryName, directory, remoteFileName, localPath := nexusclient.UploadFileArgsForCall(0)
+				repositoryName, group, remoteFileName, localPath := nexusclient.UploadFileArgsForCall(0)
 				Ω(repositoryName).Should(Equal("repository-name"))
-				Ω(directory).Should(Equal("/files"))
+				Ω(group).Should(Equal("/files"))
 				Ω(remoteFileName).Should(Equal("file.tgz"))
 				Ω(localPath).Should(Equal(filepath.Join(sourceDir, "a/file.tgz")))
 
