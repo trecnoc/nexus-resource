@@ -21,7 +21,7 @@ filenames to identify version numbers.
 
 * `regexp`: *Required for check and in.* The pattern to match artifact name
   against within Nexus; this regex should match the full name of the files, which
-  consists of the directory minus the leading '/'. The first grouped match is
+  consists of the `group` minus the leading '/'. The first grouped match is
   used to extract the version, or if a group is explicitly named `version`, that
   group is used. At least one capture group must be specified, with parentheses.
 

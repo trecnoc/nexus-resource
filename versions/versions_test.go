@@ -83,7 +83,7 @@ var _ = Describe("Match", func() {
 	Describe("Match", func() {
 		ItMatchesPaths(versions.Match)
 
-		It("does not contain files that are in some subdirectory that is not explicitly mentioned", func() {
+		It("does not contain files that are in some sub-group that is not explicitly mentioned", func() {
 			paths := []string{"folder/abc", "abc"}
 			regex := "abc"
 

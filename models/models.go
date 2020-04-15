@@ -8,7 +8,7 @@ type Source struct {
 	Repository string `json:"repository"`
 	Username   string `json:"username"`
 	Password   string `json:"password"`
-	Group      string `json:"directory"`
+	Group      string `json:"group"`
 	Regexp     string `json:"regexp"`
 	Debug      bool   `json:"debug"`
 }
