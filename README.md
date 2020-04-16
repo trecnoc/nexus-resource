@@ -19,11 +19,11 @@ filenames to identify version numbers.
 * `group`: *Required for check and out.* The repository artifact group, supports
   Glob patterns for `check`.
 
-* `regexp`: *Required for check and in.* The pattern to match artifact name
-  against within Nexus; this regex should match the full name of the files, which
-  consists of the `group` minus the leading '/'. The first grouped match is
-  used to extract the version, or if a group is explicitly named `version`, that
-  group is used. At least one capture group must be specified, with parentheses.
+* `regexp`: *Required.* The pattern to match artifact name against within Nexus;
+  this regex should match the full name of the files, which consists of the
+  `group` minus the leading '/'. The first grouped match is used to extract the
+  version, or if a group is explicitly named `version`, that group is used. At
+  least one capture group must be specified, with parentheses.
 
   The version extracted from this pattern is used to version the resource.
   Semantic versions, or just numbers, are supported. Accordingly, full regular
