@@ -10,6 +10,7 @@ type Source struct {
 	Password   string `json:"password"`
 	Group      string `json:"group"`
 	Regexp     string `json:"regexp"`
+	Timeout    int    `json:"timeout"`
 	Debug      bool   `json:"debug"`
 }
 

@@ -21,6 +21,7 @@ var url = os.Getenv("NEXUS_TESTING_URL")
 var username = os.Getenv("NEXUS_TESTING_USERNAME")
 var password = os.Getenv("NEXUS_TESTING_PASSWORD")
 var repository = os.Getenv("NEXUS_TESTING_REPOSITORY")
+var timeout = os.Getenv("NEXUS_TESTING_TIMEOUT")
 var debug = os.Getenv("NEXUS_TESTING_DEBUG")
 
 var nexusclient nexusresource.NexusClient
@@ -74,12 +75,17 @@ var _ = SynchronizedBeforeSuite(func() []byte {
 		Ω(password).ShouldNot(BeEmpty(), "must specify $NEXUS_TESTING_PASSWORD")
 		Ω(repository).ShouldNot(BeEmpty(), "must specify $NEXUS_TESTING_REPOSITORY")
 
-		debugbool, err := strconv.ParseBool(debug)
+		timeoutInt, err := strconv.Atoi(timeout)
 		if err != nil {
-			debugbool = false
+			timeoutInt = 0
 		}
 
-		nexusclient = nexusresource.NewNexusClient(url, username, password, debugbool)
+		debugBool, err := strconv.ParseBool(debug)
+		if err != nil {
+			debugBool = false
+		}
+
+		nexusclient = nexusresource.NewNexusClient(url, username, password, timeoutInt, debugBool)
 	}
 })
 

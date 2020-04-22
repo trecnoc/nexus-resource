@@ -29,6 +29,9 @@ filenames to identify version numbers.
   Semantic versions, or just numbers, are supported. Accordingly, full regular
   expressions are supported, to specify the capture groups.
 
+* `timeout`: *Optional defaults to `10`.* Timeout for the internal HTTP Client in
+  seconds.
+
 * `debug`: *Optional defaults to `false`.* Debug flag for enabling logging and
   request file output in `/tmp`.
 

@@ -38,9 +38,14 @@ type nexusclient struct {
 }
 
 // NewNexusClient creates and returns an NexusClient
-func NewNexusClient(nexusURL string, username string, password string, debug bool) NexusClient {
+func NewNexusClient(nexusURL string, username string, password string, timeout int, debug bool) NexusClient {
+	// Set a default timeout
+	if timeout == 0 {
+		timeout = 10
+	}
+
 	httpClient := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: time.Duration(timeout) * time.Second,
 	}
 
 	var logger = utils.NewLogger(debug)
