@@ -26,7 +26,7 @@ func main() {
 
 	sourceDir := os.Args[1]
 
-	client := nexusresource.NewNexusClient(request.Source.URL, request.Source.Username, request.Source.Password, request.Source.Debug)
+	client := nexusresource.NewNexusClient(request.Source.URL, request.Source.Username, request.Source.Password, request.Source.Timeout, request.Source.Debug)
 
 	command := out.NewCommand(os.Stderr, client)
 	response, err := command.Run(sourceDir, request)

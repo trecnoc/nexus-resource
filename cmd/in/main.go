@@ -26,7 +26,7 @@ func main() {
 		ioutil.WriteFile("/tmp/concourse-nexus-request.json", jsonString, os.ModePerm)
 	}
 
-	client := nexusresource.NewNexusClient(request.Source.URL, request.Source.Username, request.Source.Password, request.Source.Debug)
+	client := nexusresource.NewNexusClient(request.Source.URL, request.Source.Username, request.Source.Password, request.Source.Timeout, request.Source.Debug)
 
 	command := in.NewCommand(client)
 	response, err := command.Run(destinationDir, request)
