@@ -48,6 +48,14 @@ func (l *StandardLogger) NewNexusClient(nexusURL string, username string) {
 	}
 }
 
+// LogSimpleMessageAndSay according to a format specifier
+func (l *StandardLogger) LogSimpleMessageAndSay(message string, a ...interface{}) {
+	Sayf(message+"\n", a...)
+	if l.enabled {
+		l.logger.Info(fmt.Sprintf(message, a...))
+	}
+}
+
 // LogSimpleMessage according to a format specifier
 func (l *StandardLogger) LogSimpleMessage(message string, a ...interface{}) {
 	if l.enabled {
