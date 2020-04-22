@@ -61,7 +61,7 @@ func NewNexusClient(nexusURL string, username string, password string, timeout i
 }
 
 func (client *nexusclient) ListFiles(repositoryName string, group string) ([]string, error) {
-	client.logger.LogSimpleMessage("In ListFiles for repository '%s' and group '%s'", repositoryName, group)
+	client.logger.LogSimpleMessageAndSay("Listing artifacts for repository '%s' and group '%s'", repositoryName, group)
 	entries, err := client.getRepositoryGroupContent(repositoryName, group)
 
 	if err != nil {
@@ -77,7 +77,7 @@ func (client *nexusclient) ListFiles(repositoryName string, group string) ([]str
 }
 
 func (client *nexusclient) DownloadFile(repositoryName string, name string, localPath string) error {
-	client.logger.LogSimpleMessage("In DownloadFile for repository '%s', name '%s' and path '%s'", repositoryName, name, localPath)
+	client.logger.LogSimpleMessageAndSay("Downloading artifact from repository '%s' with name '%s' to path '%s'", repositoryName, name, localPath)
 	var url string
 
 	url = client.URL(repositoryName, name)
@@ -108,7 +108,7 @@ func (client *nexusclient) DownloadFile(repositoryName string, name string, loca
 }
 
 func (client *nexusclient) UploadFile(repositoryName string, group string, remoteFilename string, localPath string) error {
-	client.logger.LogSimpleMessage("In UploadFile for repository '%s', group '%s', filename '%s' and path '%s'", repositoryName, group, remoteFilename, localPath)
+	client.logger.LogSimpleMessageAndSay("Uploading artifact '%s' to repository '%s' in group '%s' with name '%s'", localPath, repositoryName, group, remoteFilename)
 	localFile, err := os.Open(localPath)
 	if err != nil {
 		return err
@@ -161,7 +161,7 @@ func (client *nexusclient) UploadFile(repositoryName string, group string, remot
 }
 
 func (client *nexusclient) DeleteFile(repositoryName string, name string) error {
-	client.logger.LogSimpleMessage("In DeleteFile for repository '%s' and name '%s'", repositoryName, name)
+	client.logger.LogSimpleMessageAndSay("Deleting artifact from repository '%s' with name '%s'", repositoryName, name)
 	item, err := client.getRepositoryItem(repositoryName, name)
 	if err != nil {
 		return err
@@ -193,14 +193,14 @@ func (client *nexusclient) DeleteFile(repositoryName string, name string) error 
 }
 
 func (client *nexusclient) URL(repositoryName string, name string) string {
-	client.logger.LogSimpleMessage("In URL for repository '%s' and name '%s'", repositoryName, name)
+	client.logger.LogSimpleMessageAndSay("Getting URL for artifact in repository '%s' with name '%s'", repositoryName, name)
 	u, _ := url.Parse(client.nexusURL)
 	u.Path = path.Join(u.Path, "repository", repositoryName, name)
 	return u.String()
 }
 
 func (client *nexusclient) SHA(repositoryName string, name string) string {
-	client.logger.LogSimpleMessage("In SHA for repository '%s' and name '%s'", repositoryName, name)
+	client.logger.LogSimpleMessageAndSay("Getting SHA for artifact in repository '%s' and name '%s'", repositoryName, name)
 	var sha string
 
 	item, err := client.getRepositoryItem(repositoryName, name)
